@@ -3,8 +3,20 @@
 function main {
   local shome="$(cd -P -- "${BASH_SOURCE%/*}/.." && pwd -P)"
   source "$shome/script/profile"
+  source normalize
 
-  uname -a
+  local url_awsokta_Darwin="https://github.com/segmentio/aws-okta/releases/download/v${AWS_OKTA_VERSION}/aws-okta-v${AWS_OKTA_VERSION}-darwin-amd64"
+  local url_awsokta_Linux="https://github.com/segmentio/aws-okta/releases/download/v${AWS_OKTA_VERSION}/aws-okta-v${AWS_OKTA_VERSION}-linux-amd64"
+
+  local url_awsokta="url_awsokta_$(uname -s)"
+  local fnm_awsokta="$(basename "${!url_awsokta}")-${AWS_OKTA_VERSION}"
+  cache curl "$fnm_awsokta" "${!url_awsokta}"
+
+  mkdir -p "$shome/bin"
+  pushd "$shome/bin"
+  cp "${DATA}/cache/curl/$fnm_awsokta" "$shome/bin/aws-okta"
+  chmod 755 "$shome/bin/aws-okta"
+  popd
 }
 
 main "$@"
